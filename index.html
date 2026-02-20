@@ -4,17 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Foto's toevoegen aan gedeeld album</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #f5f0e8;
-    --ink: #1a1612;
-    --accent: #c8553d;
-    --muted: #8a7f72;
+    --bg: #f0f4fa;
+    --ink: #0f1f3d;
+    --blue: #1a56db;
+    --blue-dark: #1344b8;
+    --blue-light: #e8effe;
+    --muted: #5c7099;
     --card: #ffffff;
-    --green: #3a7d4f;
+    --border: #dce6f5;
+    --red: #d93025;
+    --red-light: #fce8e6;
   }
 
   body {
@@ -28,54 +32,57 @@
     padding: 2rem 1rem;
   }
 
-  .container { max-width: 480px; width: 100%; }
+  .container { max-width: 440px; width: 100%; }
 
+  /* ── Header ── */
   .header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
     animation: fadeUp 0.6s ease both;
   }
 
-  .icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+  .icon { font-size: 2.4rem; display: block; margin-bottom: 0.85rem; }
 
   h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 300;
-    font-size: 2rem;
-    line-height: 1.15;
-    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 1.45rem;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
   }
 
-  h1 em { font-style: italic; color: var(--accent); }
-  .subtitle { color: var(--muted); font-size: 0.9rem; font-weight: 300; }
+  h1 em { font-style: normal; color: var(--blue); }
+  .subtitle { color: var(--muted); font-size: 0.85rem; }
 
   /* ── Album link card ── */
   .album-card {
-    background: var(--green);
-    border-radius: 18px;
-    padding: 1.2rem 1.4rem;
-    margin-bottom: 1.75rem;
+    background: var(--blue);
+    border-radius: 14px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.25rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.85rem;
     animation: fadeUp 0.5s 0.05s ease both;
   }
 
-  .album-card-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .album-card-icon { font-size: 1.4rem; flex-shrink: 0; }
   .album-card-text { flex: 1; min-width: 0; }
 
   .album-card-label {
-    color: rgba(255,255,255,0.7);
-    font-size: 0.72rem;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.67rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.2rem;
+    letter-spacing: 0.09em;
+    margin-bottom: 0.15rem;
+    font-weight: 500;
   }
 
   .album-link-btn {
     display: block;
     color: #fff;
-    font-size: 1rem;
+    font-size: 0.92rem;
     font-weight: 500;
     text-decoration: none;
     white-space: nowrap;
@@ -87,149 +94,201 @@
   .album-link-btn:hover { opacity: 0.8; text-decoration: underline; }
 
   .album-link-btn.no-link {
-    color: rgba(255,255,255,0.55);
+    color: rgba(255,255,255,0.5);
     font-style: italic;
-    font-size: 0.88rem;
-    font-weight: 300;
+    font-size: 0.85rem;
+    font-weight: 400;
     pointer-events: none;
   }
 
-  .edit-btn {
-    background: rgba(255,255,255,0.18);
-    border: none;
-    border-radius: 10px;
-    color: #fff;
-    font-size: 0.78rem;
-    font-family: 'DM Sans', sans-serif;
-    padding: 0.4rem 0.75rem;
+  /* Admin gear icon — subtle, bottom-right corner */
+  .admin-trigger {
+    position: fixed;
+    bottom: 1.2rem;
+    right: 1.2rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: color 0.2s, border-color 0.2s;
+    z-index: 50;
   }
 
-  .edit-btn:hover { background: rgba(255,255,255,0.3); }
+  .admin-trigger:hover { color: var(--blue); border-color: var(--blue); }
 
-  /* ── Modal ── */
+  /* ── Modals shared ── */
   .modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(10,25,60,0.4);
     z-index: 100;
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    backdrop-filter: blur(3px);
+    backdrop-filter: blur(4px);
   }
 
   .modal-overlay.open { display: flex; }
 
   .modal {
     background: #fff;
-    border-radius: 20px;
-    padding: 1.75rem 1.5rem;
+    border-radius: 18px;
+    padding: 1.6rem 1.4rem;
     width: 100%;
-    max-width: 400px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    animation: modalPop 0.25s ease;
+    max-width: 360px;
+    box-shadow: 0 16px 48px rgba(20,60,140,0.15);
+    animation: modalPop 0.22s ease;
   }
 
   @keyframes modalPop {
-    from { opacity: 0; transform: scale(0.93) translateY(12px); }
+    from { opacity: 0; transform: scale(0.94) translateY(10px); }
     to   { opacity: 1; transform: scale(1) translateY(0); }
   }
 
   .modal h2 {
-    font-family: 'Fraunces', serif;
-    font-weight: 300;
-    font-size: 1.3rem;
-    margin-bottom: 0.4rem;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
   }
 
   .modal p {
     color: var(--muted);
-    font-size: 0.82rem;
-    margin-bottom: 1.1rem;
+    font-size: 0.79rem;
+    margin-bottom: 0.9rem;
     line-height: 1.5;
+  }
+
+  .modal label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.3rem;
   }
 
   .modal input {
     width: 100%;
-    border: 2px solid #e8e2d8;
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.65rem 0.9rem;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: var(--ink);
+    background: var(--bg);
     outline: none;
-    transition: border-color 0.2s;
-    margin-bottom: 1rem;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 0.75rem;
   }
 
-  .modal input:focus { border-color: var(--green); }
+  .modal input:focus { border-color: var(--blue); background: #fff; }
+  .modal input.error { border-color: var(--red); }
 
-  .modal-actions { display: flex; gap: 0.75rem; }
+  .error-msg {
+    font-size: 0.75rem;
+    color: var(--red);
+    margin-top: -0.5rem;
+    margin-bottom: 0.65rem;
+    display: none;
+  }
 
-  .btn-save {
+  .error-msg.visible { display: block; }
+
+  .modal-actions { display: flex; gap: 0.6rem; margin-top: 0.2rem; }
+
+  .btn-primary {
     flex: 1;
-    background: var(--green);
+    background: var(--blue);
     color: #fff;
     border: none;
-    border-radius: 12px;
-    padding: 0.75rem;
+    border-radius: 10px;
+    padding: 0.65rem;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .btn-save:hover { opacity: 0.85; }
-
-  .btn-cancel {
-    background: #f0ebe3;
-    color: var(--muted);
-    border: none;
-    border-radius: 12px;
-    padding: 0.75rem 1.1rem;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
     cursor: pointer;
     transition: background 0.2s;
   }
 
-  .btn-cancel:hover { background: #e6e0d5; }
+  .btn-primary:hover { background: var(--blue-dark); }
+
+  .btn-secondary {
+    background: var(--blue-light);
+    color: var(--blue);
+    border: none;
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-secondary:hover { background: #d5e3f8; }
+
+  .btn-danger {
+    background: var(--red-light);
+    color: var(--red);
+    border: none;
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-danger:hover { background: #f5c6c2; }
+
+  .divider {
+    border: none;
+    border-top: 1.5px solid var(--border);
+    margin: 1rem 0;
+  }
 
   /* ── Steps ── */
-  .steps { display: flex; flex-direction: column; gap: 0.75rem; }
+  .steps { display: flex; flex-direction: column; gap: 0.5rem; }
 
   .step {
     background: var(--card);
-    border-radius: 16px;
-    padding: 1.1rem 1.25rem;
+    border-radius: 12px;
+    padding: 0.95rem 1.1rem;
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    gap: 0.9rem;
+    border: 1px solid var(--border);
     animation: fadeUp 0.5s ease both;
   }
 
-  .step:nth-child(1) { animation-delay: 0.12s; }
-  .step:nth-child(2) { animation-delay: 0.20s; }
-  .step:nth-child(3) { animation-delay: 0.28s; }
-  .step:nth-child(4) { animation-delay: 0.36s; }
-  .step:nth-child(5) { animation-delay: 0.44s; }
-  .step:nth-child(6) { animation-delay: 0.52s; }
+  .step:nth-child(1) { animation-delay: 0.10s; }
+  .step:nth-child(2) { animation-delay: 0.17s; }
+  .step:nth-child(3) { animation-delay: 0.24s; }
+  .step:nth-child(4) { animation-delay: 0.31s; }
+  .step:nth-child(5) { animation-delay: 0.38s; }
+  .step:nth-child(6) { animation-delay: 0.45s; }
 
   .step-num {
-    background: var(--ink);
-    color: #fff;
-    font-family: 'Fraunces', serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    background: var(--blue-light);
+    color: var(--blue);
+    font-size: 0.78rem;
+    font-weight: 700;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -238,25 +297,26 @@
   }
 
   .step-content { flex: 1; }
-  .step-title { font-weight: 500; font-size: 0.95rem; margin-bottom: 0.2rem; }
-  .step-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.45; font-weight: 300; }
-  .step-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+  .step-title { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.15rem; color: var(--ink); }
+  .step-desc { color: var(--muted); font-size: 0.79rem; line-height: 1.45; }
+  .step-desc strong { color: var(--ink); font-weight: 500; }
+  .step-icon { font-size: 1rem; flex-shrink: 0; margin-top: 3px; opacity: 0.7; }
 
   .tip {
-    margin-top: 1.5rem;
-    background: #fff8f5;
-    border-left: 3px solid var(--accent);
-    border-radius: 0 12px 12px 0;
-    padding: 0.85rem 1rem;
-    font-size: 0.82rem;
+    margin-top: 1.1rem;
+    background: var(--blue-light);
+    border-left: 3px solid var(--blue);
+    border-radius: 0 10px 10px 0;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.78rem;
     color: var(--muted);
-    animation: fadeUp 0.5s 0.58s ease both;
+    animation: fadeUp 0.5s 0.52s ease both;
   }
 
-  .tip strong { color: var(--accent); font-weight: 500; }
+  .tip strong { color: var(--blue); font-weight: 500; }
 
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
+    from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 </style>
@@ -266,7 +326,7 @@
 <div class="container">
   <div class="header">
     <span class="icon">📸</span>
-    <h1>Foto's in het<br><em>gedeelde album</em> zetten</h1>
+    <h1>Foto's in het <em>gedeelde album</em> zetten</h1>
     <p class="subtitle">Volg deze stappen op je iPhone of iPad</p>
   </div>
 
@@ -275,9 +335,8 @@
     <div class="album-card-icon">🔗</div>
     <div class="album-card-text">
       <div class="album-card-label">Gedeeld album</div>
-      <a id="albumLink" href="#" target="_blank" class="album-link-btn no-link">Nog geen link ingesteld</a>
+      <a id="albumLink" href="#" target="_blank" class="album-link-btn no-link">Wordt geladen…</a>
     </div>
-    <button class="edit-btn" onclick="openModal()">✏️ Bewerk</button>
   </div>
 
   <!-- Steps -->
@@ -286,20 +345,18 @@
       <div class="step-num">1</div>
       <div class="step-content">
         <div class="step-title">Open de Foto's-app</div>
-        <div class="step-desc">Ga naar je Camera Rol of een bestaand album met de foto's die je wilt delen.</div>
+        <div class="step-desc">Ga naar je Camera Rol of een album met de foto's die je wilt delen.</div>
       </div>
       <div class="step-icon">🖼️</div>
     </div>
-
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-content">
         <div class="step-title">Selecteer foto's</div>
-        <div class="step-desc">Tik op <strong>Selecteer</strong> (rechtsboven) en tik alle foto's aan die je wilt toevoegen.</div>
+        <div class="step-desc">Tik op <strong>Selecteer</strong> (rechtsboven) en tik alle foto's aan.</div>
       </div>
       <div class="step-icon">☑️</div>
     </div>
-
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-content">
@@ -308,7 +365,6 @@
       </div>
       <div class="step-icon">⬆️</div>
     </div>
-
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-content">
@@ -317,21 +373,19 @@
       </div>
       <div class="step-icon">＋</div>
     </div>
-
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-content">
         <div class="step-title">Selecteer het juiste album</div>
-        <div class="step-desc">Kies het gedeelde album uit de lijst, of tik op <strong>Nieuw gedeeld album</strong> om er een aan te maken.</div>
+        <div class="step-desc">Kies het album uit de lijst, of maak een <strong>Nieuw gedeeld album</strong> aan.</div>
       </div>
       <div class="step-icon">📁</div>
     </div>
-
     <div class="step">
       <div class="step-num">6</div>
       <div class="step-content">
         <div class="step-title">Tik op "Publiceer"</div>
-        <div class="step-desc">Bevestig met <strong>Publiceer</strong>. De foto's zijn nu zichtbaar voor iedereen in het album!</div>
+        <div class="step-desc">Bevestig met <strong>Publiceer</strong>. De foto's zijn nu zichtbaar voor iedereen!</div>
       </div>
       <div class="step-icon">✅</div>
     </div>
@@ -342,29 +396,74 @@
   </div>
 </div>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+<!-- Verborgen admin-knopje rechtsonder -->
+<button class="admin-trigger" onclick="openPasswordModal()" title="Beheer">⚙️</button>
+
+<!-- Modal 1: Wachtwoord invoeren -->
+<div class="modal-overlay" id="passwordModal" onclick="handleOverlay(event,'passwordModal')">
   <div class="modal">
-    <h2>Albumlink instellen</h2>
-    <p>Plak hier de uitnodigingslink van je gedeelde Apple-album. Je vindt deze in de Foto's-app onder <strong>Gedeeld → jouw album → Personen → Deel link</strong>.</p>
-    <input type="url" id="linkInput" placeholder="https://share.icloud.com/photos/..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <h2>🔒 Beheerderslogin</h2>
+    <p>Voer het beheerwachtwoord in om de albumlink te beheren.</p>
+    <label for="passwordInput">Wachtwoord</label>
+    <input type="password" id="passwordInput" placeholder="••••••••">
+    <div class="error-msg" id="passwordError">Onjuist wachtwoord. Probeer opnieuw.</div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Annuleer</button>
-      <button class="btn-save" onclick="saveLink()">Opslaan</button>
+      <button class="btn-secondary" onclick="closeModal('passwordModal')">Annuleer</button>
+      <button class="btn-primary" onclick="checkPassword()">Inloggen</button>
     </div>
   </div>
 </div>
 
-<script>
-  const STORAGE_KEY = 'sharedAlbumLink';
+<!-- Modal 2: Admin beheerpaneel -->
+<div class="modal-overlay" id="adminModal" onclick="handleOverlay(event,'adminModal')">
+  <div class="modal">
+    <h2>⚙️ Albumlink beheren</h2>
+    <p>Stel de uitnodigingslink in van je gedeelde Apple-album. De link is zichtbaar voor alle bezoekers.</p>
+    <label for="linkInput">Albumlink</label>
+    <input type="url" id="linkInput" placeholder="https://share.icloud.com/photos/..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div class="modal-actions">
+      <button class="btn-danger" onclick="deleteLink()">Verwijder</button>
+      <button class="btn-secondary" onclick="closeModal('adminModal')">Annuleer</button>
+      <button class="btn-primary" onclick="saveLink()">Opslaan</button>
+    </div>
 
-  function loadLink() {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    <hr class="divider">
+    <p style="font-size:0.73rem; color:var(--muted); margin-bottom:0;">
+      <strong style="color:var(--ink);">Wachtwoord wijzigen?</strong><br>
+      Open het HTML-bestand en zoek op <code style="background:var(--bg);padding:1px 4px;border-radius:4px;font-size:0.72rem;">ADMIN_PASSWORD</code> om het aan te passen.
+    </p>
+  </div>
+</div>
+
+<script>
+  // ── Pas dit wachtwoord aan naar wens ──
+  const ADMIN_PASSWORD = 'feest2025';
+  const STORAGE_KEY    = 'sharedAlbumLink';
+
+  // ── Storage helpers (shared = zichtbaar voor iedereen) ──
+  async function getSharedLink() {
+    try {
+      const result = await window.storage.get(STORAGE_KEY, true);
+      return result ? result.value : null;
+    } catch { return null; }
+  }
+
+  async function setSharedLink(url) {
+    await window.storage.set(STORAGE_KEY, url, true);
+  }
+
+  async function removeSharedLink() {
+    await window.storage.delete(STORAGE_KEY, true);
+  }
+
+  // ── Render link card ──
+  async function loadLink() {
+    const saved = await getSharedLink();
     const el = document.getElementById('albumLink');
     if (saved) {
       el.href = saved;
       const display = saved.replace(/^https?:\/\//, '').replace(/\/$/, '');
-      el.textContent = display.length > 38 ? display.slice(0, 38) + '…' : display;
+      el.textContent = display.length > 40 ? display.slice(0, 40) + '…' : display;
       el.classList.remove('no-link');
     } else {
       el.href = '#';
@@ -373,37 +472,74 @@
     }
   }
 
-  function openModal() {
-    document.getElementById('linkInput').value = localStorage.getItem(STORAGE_KEY) || '';
-    document.getElementById('modalOverlay').classList.add('open');
-    setTimeout(() => document.getElementById('linkInput').focus(), 100);
+  // ── Password modal ──
+  function openPasswordModal() {
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordError').classList.remove('visible');
+    document.getElementById('passwordInput').classList.remove('error');
+    openModal('passwordModal');
+    setTimeout(() => document.getElementById('passwordInput').focus(), 120);
   }
 
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('open');
-  }
-
-  function saveLink() {
-    let val = document.getElementById('linkInput').value.trim();
-    if (val && !val.startsWith('http')) val = 'https://' + val;
-    if (val) {
-      localStorage.setItem(STORAGE_KEY, val);
+  async function checkPassword() {
+    const val = document.getElementById('passwordInput').value;
+    if (val === ADMIN_PASSWORD) {
+      closeModal('passwordModal');
+      openAdminModal();
     } else {
-      localStorage.removeItem(STORAGE_KEY);
+      document.getElementById('passwordError').classList.add('visible');
+      document.getElementById('passwordInput').classList.add('error');
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
     }
-    loadLink();
-    closeModal();
   }
 
-  function handleOverlayClick(e) {
-    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  // ── Admin modal ──
+  async function openAdminModal() {
+    const saved = await getSharedLink();
+    document.getElementById('linkInput').value = saved || '';
+    openModal('adminModal');
+    setTimeout(() => document.getElementById('linkInput').focus(), 120);
+  }
+
+  async function saveLink() {
+    let val = document.getElementById('linkInput').value.trim();
+    if (!val) { await removeSharedLink(); }
+    else {
+      if (!val.startsWith('http')) val = 'https://' + val;
+      await setSharedLink(val);
+    }
+    await loadLink();
+    closeModal('adminModal');
+  }
+
+  async function deleteLink() {
+    if (!confirm('Weet je zeker dat je de albumlink wilt verwijderen?')) return;
+    await removeSharedLink();
+    await loadLink();
+    closeModal('adminModal');
+  }
+
+  // ── Modal helpers ──
+  function openModal(id)  { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  function handleOverlay(e, id) {
+    if (e.target === document.getElementById(id)) closeModal(id);
   }
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('open')) saveLink();
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape') {
+      closeModal('passwordModal');
+      closeModal('adminModal');
+    }
+    if (e.key === 'Enter') {
+      if (document.getElementById('passwordModal').classList.contains('open')) checkPassword();
+      if (document.getElementById('adminModal').classList.contains('open')) saveLink();
+    }
   });
 
+  // ── Init ──
   loadLink();
 </script>
 </body>
