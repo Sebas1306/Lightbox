@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Foto's toevoegen aan gedeeld album</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+  // ════════════════════════════════════════════
+  //  ✏️  HIER JOUW INSTELLINGEN INVULLEN
+  // ════════════════════════════════════════════
+
+  const CONFIG = {
+    GIST_ID:       'fad087143293da997375538739bf1538',
+    GITHUB_TOKEN:  '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',
+    GIST_FILENAME: 'album-link.json',          // bestandsnaam in de Gist
+    ADMIN_PASSWORD:'feest2025',                // ← verander dit wachtwoord
+  };
+
+  // ════════════════════════════════════════════
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -19,6 +33,8 @@
     --border: #dce6f5;
     --red: #d93025;
     --red-light: #fce8e6;
+    --yellow: #f59e0b;
+    --yellow-light: #fef3c7;
   }
 
   body {
@@ -34,7 +50,6 @@
 
   .container { max-width: 440px; width: 100%; }
 
-  /* ── Header ── */
   .header {
     text-align: center;
     margin-bottom: 2rem;
@@ -54,6 +69,22 @@
 
   h1 em { font-style: normal; color: var(--blue); }
   .subtitle { color: var(--muted); font-size: 0.85rem; }
+
+  /* ── Setup banner ── */
+  .setup-banner {
+    background: var(--yellow-light);
+    border: 1.5px solid var(--yellow);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.8rem;
+    color: #92400e;
+    line-height: 1.6;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .setup-banner strong { font-weight: 600; display: block; margin-bottom: 0.15rem; }
+  .setup-banner.hidden { display: none; }
 
   /* ── Album link card ── */
   .album-card {
@@ -101,7 +132,7 @@
     pointer-events: none;
   }
 
-  /* Admin gear icon — subtle, bottom-right corner */
+  /* ── Admin trigger ── */
   .admin-trigger {
     position: fixed;
     bottom: 1.2rem;
@@ -124,7 +155,7 @@
 
   .admin-trigger:hover { color: var(--blue); border-color: var(--blue); }
 
-  /* ── Modals shared ── */
+  /* ── Modals ── */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -144,7 +175,7 @@
     border-radius: 18px;
     padding: 1.6rem 1.4rem;
     width: 100%;
-    max-width: 360px;
+    max-width: 380px;
     box-shadow: 0 16px 48px rgba(20,60,140,0.15);
     animation: modalPop 0.22s ease;
   }
@@ -154,13 +185,7 @@
     to   { opacity: 1; transform: scale(1) translateY(0); }
   }
 
-  .modal h2 {
-    font-weight: 600;
-    font-size: 1.05rem;
-    margin-bottom: 0.3rem;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-  }
+  .modal h2 { font-weight: 600; font-size: 1.05rem; margin-bottom: 0.3rem; color: var(--ink); }
 
   .modal p {
     color: var(--muted);
@@ -171,11 +196,11 @@
 
   .modal label {
     display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.73rem;
+    font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.07em;
     margin-bottom: 0.3rem;
   }
 
@@ -203,7 +228,6 @@
     margin-bottom: 0.65rem;
     display: none;
   }
-
   .error-msg.visible { display: block; }
 
   .modal-actions { display: flex; gap: 0.6rem; margin-top: 0.2rem; }
@@ -220,9 +244,14 @@
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
   }
 
-  .btn-primary:hover { background: var(--blue-dark); }
+  .btn-primary:hover:not(:disabled) { background: var(--blue-dark); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 
   .btn-secondary {
     background: var(--blue-light);
@@ -244,7 +273,7 @@
     color: var(--red);
     border: none;
     border-radius: 10px;
-    padding: 0.65rem 1rem;
+    padding: 0.65rem 0.9rem;
     font-family: 'DM Sans', sans-serif;
     font-size: 0.88rem;
     font-weight: 500;
@@ -254,11 +283,17 @@
 
   .btn-danger:hover { background: #f5c6c2; }
 
-  .divider {
-    border: none;
-    border-top: 1.5px solid var(--border);
-    margin: 1rem 0;
+  .divider { border: none; border-top: 1.5px solid var(--border); margin: 1rem 0; }
+
+  .spinner {
+    width: 13px; height: 13px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
   }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── Steps ── */
   .steps { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -330,7 +365,11 @@
     <p class="subtitle">Volg deze stappen op je iPhone of iPad</p>
   </div>
 
-  <!-- Album link card -->
+  <div class="setup-banner hidden" id="setupBanner">
+    <strong>⚠️ Configuratie ontbreekt</strong>
+    Vul GIST_ID en GITHUB_TOKEN in bovenaan het HTML-bestand en upload opnieuw naar GitHub Pages.
+  </div>
+
   <div class="album-card">
     <div class="album-card-icon">🔗</div>
     <div class="album-card-text">
@@ -339,7 +378,6 @@
     </div>
   </div>
 
-  <!-- Steps -->
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
@@ -369,7 +407,7 @@
       <div class="step-num">4</div>
       <div class="step-content">
         <div class="step-title">Kies "Voeg toe aan gedeeld album"</div>
-        <div class="step-desc">Scroll naar beneden in het deelmenu en tik op <strong>Voeg toe aan gedeeld album</strong>.</div>
+        <div class="step-desc">Scroll in het deelmenu en tik op <strong>Voeg toe aan gedeeld album</strong>.</div>
       </div>
       <div class="step-icon">＋</div>
     </div>
@@ -396,14 +434,14 @@
   </div>
 </div>
 
-<!-- Verborgen admin-knopje rechtsonder -->
+<!-- Admin knopje -->
 <button class="admin-trigger" onclick="openPasswordModal()" title="Beheer">⚙️</button>
 
-<!-- Modal 1: Wachtwoord invoeren -->
+<!-- Modal: Wachtwoord -->
 <div class="modal-overlay" id="passwordModal" onclick="handleOverlay(event,'passwordModal')">
   <div class="modal">
     <h2>🔒 Beheerderslogin</h2>
-    <p>Voer het beheerwachtwoord in om de albumlink te beheren.</p>
+    <p>Voer het beheerwachtwoord in om de albumlink aan te passen.</p>
     <label for="passwordInput">Wachtwoord</label>
     <input type="password" id="passwordInput" placeholder="••••••••">
     <div class="error-msg" id="passwordError">Onjuist wachtwoord. Probeer opnieuw.</div>
@@ -414,55 +452,80 @@
   </div>
 </div>
 
-<!-- Modal 2: Admin beheerpaneel -->
+<!-- Modal: Admin paneel -->
 <div class="modal-overlay" id="adminModal" onclick="handleOverlay(event,'adminModal')">
   <div class="modal">
     <h2>⚙️ Albumlink beheren</h2>
-    <p>Stel de uitnodigingslink in van je gedeelde Apple-album. De link is zichtbaar voor alle bezoekers.</p>
+    <p>De link wordt opgeslagen in je GitHub Gist en is meteen zichtbaar voor alle bezoekers.</p>
     <label for="linkInput">Albumlink</label>
     <input type="url" id="linkInput" placeholder="https://share.icloud.com/photos/..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div class="error-msg" id="saveError">Opslaan mislukt. Controleer je Gist ID en Token.</div>
     <div class="modal-actions">
-      <button class="btn-danger" onclick="deleteLink()">Verwijder</button>
+      <button class="btn-danger" id="deleteBtn" onclick="deleteLink()">Verwijder</button>
       <button class="btn-secondary" onclick="closeModal('adminModal')">Annuleer</button>
-      <button class="btn-primary" onclick="saveLink()">Opslaan</button>
+      <button class="btn-primary" id="saveBtn" onclick="saveLink()">Opslaan</button>
     </div>
-
-    <hr class="divider">
-    <p style="font-size:0.73rem; color:var(--muted); margin-bottom:0;">
-      <strong style="color:var(--ink);">Wachtwoord wijzigen?</strong><br>
-      Open het HTML-bestand en zoek op <code style="background:var(--bg);padding:1px 4px;border-radius:4px;font-size:0.72rem;">ADMIN_PASSWORD</code> om het aan te passen.
-    </p>
   </div>
 </div>
 
 <script>
-  // ── Pas dit wachtwoord aan naar wens ──
-  const ADMIN_PASSWORD = 'feest2025';
-  const STORAGE_KEY    = 'sharedAlbumLink';
+  // ── Controleer of config ingevuld is ──
+  const configured = CONFIG.GIST_ID !== 'JOUW_GIST_ID_HIER' && CONFIG.GITHUB_TOKEN !== 'JOUW_GITHUB_TOKEN_HIER';
 
-  // ── Storage helpers (shared = zichtbaar voor iedereen) ──
-  async function getSharedLink() {
+  if (!configured) {
+    document.getElementById('setupBanner').classList.remove('hidden');
+  }
+
+  // ── GitHub Gist API ──
+  const GIST_API = `https://api.github.com/gists/${CONFIG.GIST_ID}`;
+  const HEADERS  = {
+    'Authorization': `token ${CONFIG.GITHUB_TOKEN}`,
+    'Accept': 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json',
+  };
+
+  async function fetchLink() {
+    if (!configured) return null;
     try {
-      const result = await window.storage.get(STORAGE_KEY, true);
-      return result ? result.value : null;
+      const res  = await fetch(GIST_API, { headers: HEADERS });
+      const data = await res.json();
+      const raw  = data.files?.[CONFIG.GIST_FILENAME]?.content;
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed.link || null;
     } catch { return null; }
   }
 
-  async function setSharedLink(url) {
-    await window.storage.set(STORAGE_KEY, url, true);
+  async function writeLink(url) {
+    const content = JSON.stringify({ link: url });
+    const res = await fetch(GIST_API, {
+      method: 'PATCH',
+      headers: HEADERS,
+      body: JSON.stringify({
+        files: { [CONFIG.GIST_FILENAME]: { content } }
+      }),
+    });
+    if (!res.ok) throw new Error('GitHub API error');
   }
 
-  async function removeSharedLink() {
-    await window.storage.delete(STORAGE_KEY, true);
+  async function clearLink() {
+    const content = JSON.stringify({ link: '' });
+    const res = await fetch(GIST_API, {
+      method: 'PATCH',
+      headers: HEADERS,
+      body: JSON.stringify({
+        files: { [CONFIG.GIST_FILENAME]: { content } }
+      }),
+    });
+    if (!res.ok) throw new Error('GitHub API error');
   }
 
-  // ── Render link card ──
-  async function loadLink() {
-    const saved = await getSharedLink();
+  // ── Render albumlink ──
+  function renderLink(url) {
     const el = document.getElementById('albumLink');
-    if (saved) {
-      el.href = saved;
-      const display = saved.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    if (url) {
+      el.href = url;
+      const display = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
       el.textContent = display.length > 40 ? display.slice(0, 40) + '…' : display;
       el.classList.remove('no-link');
     } else {
@@ -472,7 +535,12 @@
     }
   }
 
-  // ── Password modal ──
+  async function loadLink() {
+    const url = await fetchLink();
+    renderLink(url || null);
+  }
+
+  // ── Wachtwoord modal ──
   function openPasswordModal() {
     document.getElementById('passwordInput').value = '';
     document.getElementById('passwordError').classList.remove('visible');
@@ -482,8 +550,7 @@
   }
 
   async function checkPassword() {
-    const val = document.getElementById('passwordInput').value;
-    if (val === ADMIN_PASSWORD) {
+    if (document.getElementById('passwordInput').value === CONFIG.ADMIN_PASSWORD) {
       closeModal('passwordModal');
       openAdminModal();
     } else {
@@ -496,50 +563,67 @@
 
   // ── Admin modal ──
   async function openAdminModal() {
-    const saved = await getSharedLink();
-    document.getElementById('linkInput').value = saved || '';
+    document.getElementById('saveError').classList.remove('visible');
+    const current = await fetchLink();
+    document.getElementById('linkInput').value = current || '';
     openModal('adminModal');
     setTimeout(() => document.getElementById('linkInput').focus(), 120);
   }
 
+  function setLoading(loading) {
+    const btn = document.getElementById('saveBtn');
+    const del = document.getElementById('deleteBtn');
+    btn.disabled = loading;
+    del.disabled = loading;
+    btn.innerHTML = loading
+      ? '<div class="spinner"></div> Opslaan…'
+      : 'Opslaan';
+  }
+
   async function saveLink() {
     let val = document.getElementById('linkInput').value.trim();
-    if (!val) { await removeSharedLink(); }
-    else {
-      if (!val.startsWith('http')) val = 'https://' + val;
-      await setSharedLink(val);
+    if (!val) { await deleteLink(); return; }
+    if (!val.startsWith('http')) val = 'https://' + val;
+    setLoading(true);
+    document.getElementById('saveError').classList.remove('visible');
+    try {
+      await writeLink(val);
+      renderLink(val);
+      closeModal('adminModal');
+    } catch {
+      document.getElementById('saveError').classList.add('visible');
+    } finally {
+      setLoading(false);
     }
-    await loadLink();
-    closeModal('adminModal');
   }
 
   async function deleteLink() {
     if (!confirm('Weet je zeker dat je de albumlink wilt verwijderen?')) return;
-    await removeSharedLink();
-    await loadLink();
-    closeModal('adminModal');
+    setLoading(true);
+    try {
+      await clearLink();
+      renderLink(null);
+      closeModal('adminModal');
+    } catch {
+      document.getElementById('saveError').classList.add('visible');
+    } finally {
+      setLoading(false);
+    }
   }
 
   // ── Modal helpers ──
   function openModal(id)  { document.getElementById(id).classList.add('open'); }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-  function handleOverlay(e, id) {
-    if (e.target === document.getElementById(id)) closeModal(id);
-  }
+  function handleOverlay(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      closeModal('passwordModal');
-      closeModal('adminModal');
-    }
+    if (e.key === 'Escape') { closeModal('passwordModal'); closeModal('adminModal'); }
     if (e.key === 'Enter') {
       if (document.getElementById('passwordModal').classList.contains('open')) checkPassword();
       if (document.getElementById('adminModal').classList.contains('open')) saveLink();
     }
   });
 
-  // ── Init ──
   loadLink();
 </script>
 </body>
