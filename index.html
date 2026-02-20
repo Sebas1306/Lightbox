@@ -7,16 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>
   // ════════════════════════════════════════════
-  //  ✏️  HIER JOUW INSTELLINGEN INVULLEN
+  //  ✏️  INSTELLINGEN
   // ════════════════════════════════════════════
-
   const CONFIG = {
-    GIST_ID:       'fad087143293da997375538739bf1538',
-    GITHUB_TOKEN:  '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',
-    GIST_FILENAME: 'album-link.json',          // bestandsnaam in de Gist
-    ADMIN_PASSWORD:'feest2025',                // ← verander dit wachtwoord
+    JSONBIN_ID:     '6998419143b1c97be98e06b9',
+    JSONBIN_KEY:    '$2a$10$aKSu0JyEvLyaw5HaVrPK0OQ6rdnA85viFzpbazmiO5xKY4JXopu3G',
+    ADMIN_PASSWORD: 'feest2025',   // ← verander dit naar jouw wachtwoord
   };
-
   // ════════════════════════════════════════════
 </script>
 <style>
@@ -33,8 +30,6 @@
     --border: #dce6f5;
     --red: #d93025;
     --red-light: #fce8e6;
-    --yellow: #f59e0b;
-    --yellow-light: #fef3c7;
   }
 
   body {
@@ -69,22 +64,6 @@
 
   h1 em { font-style: normal; color: var(--blue); }
   .subtitle { color: var(--muted); font-size: 0.85rem; }
-
-  /* ── Setup banner ── */
-  .setup-banner {
-    background: var(--yellow-light);
-    border: 1.5px solid var(--yellow);
-    border-radius: 12px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 1.25rem;
-    font-size: 0.8rem;
-    color: #92400e;
-    line-height: 1.6;
-    animation: fadeUp 0.5s ease both;
-  }
-
-  .setup-banner strong { font-weight: 600; display: block; margin-bottom: 0.15rem; }
-  .setup-banner.hidden { display: none; }
 
   /* ── Album link card ── */
   .album-card {
@@ -283,8 +262,6 @@
 
   .btn-danger:hover { background: #f5c6c2; }
 
-  .divider { border: none; border-top: 1.5px solid var(--border); margin: 1rem 0; }
-
   .spinner {
     width: 13px; height: 13px;
     border: 2px solid rgba(255,255,255,0.35);
@@ -365,11 +342,6 @@
     <p class="subtitle">Volg deze stappen op je iPhone of iPad</p>
   </div>
 
-  <div class="setup-banner hidden" id="setupBanner">
-    <strong>⚠️ Configuratie ontbreekt</strong>
-    Vul GIST_ID en GITHUB_TOKEN in bovenaan het HTML-bestand en upload opnieuw naar GitHub Pages.
-  </div>
-
   <div class="album-card">
     <div class="album-card-icon">🔗</div>
     <div class="album-card-text">
@@ -434,7 +406,6 @@
   </div>
 </div>
 
-<!-- Admin knopje -->
 <button class="admin-trigger" onclick="openPasswordModal()" title="Beheer">⚙️</button>
 
 <!-- Modal: Wachtwoord -->
@@ -456,10 +427,10 @@
 <div class="modal-overlay" id="adminModal" onclick="handleOverlay(event,'adminModal')">
   <div class="modal">
     <h2>⚙️ Albumlink beheren</h2>
-    <p>De link wordt opgeslagen in je GitHub Gist en is meteen zichtbaar voor alle bezoekers.</p>
+    <p>De link wordt opgeslagen en is meteen zichtbaar voor alle bezoekers.</p>
     <label for="linkInput">Albumlink</label>
     <input type="url" id="linkInput" placeholder="https://share.icloud.com/photos/..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-    <div class="error-msg" id="saveError">Opslaan mislukt. Controleer je Gist ID en Token.</div>
+    <div class="error-msg" id="saveError">Opslaan mislukt. Probeer opnieuw.</div>
     <div class="modal-actions">
       <button class="btn-danger" id="deleteBtn" onclick="deleteLink()">Verwijder</button>
       <button class="btn-secondary" onclick="closeModal('adminModal')">Annuleer</button>
@@ -469,58 +440,33 @@
 </div>
 
 <script>
-  // ── Controleer of config ingevuld is ──
-  const configured = CONFIG.GIST_ID !== 'JOUW_GIST_ID_HIER' && CONFIG.GITHUB_TOKEN !== 'JOUW_GITHUB_TOKEN_HIER';
-
-  if (!configured) {
-    document.getElementById('setupBanner').classList.remove('hidden');
-  }
-
-  // ── GitHub Gist API ──
-  const GIST_API = `https://api.github.com/gists/${CONFIG.GIST_ID}`;
-  const HEADERS  = {
-    'Authorization': `token ${CONFIG.GITHUB_TOKEN}`,
-    'Accept': 'application/vnd.github.v3+json',
+  const API = `https://api.jsonbin.io/v3/b/${CONFIG.JSONBIN_ID}`;
+  const HEADERS = {
     'Content-Type': 'application/json',
+    'X-Master-Key': CONFIG.JSONBIN_KEY,
+    'X-Bin-Versioning': 'false',
   };
 
+  // ── Ophalen ──
   async function fetchLink() {
-    if (!configured) return null;
     try {
-      const res  = await fetch(GIST_API, { headers: HEADERS });
+      const res  = await fetch(API + '/latest', { headers: HEADERS });
       const data = await res.json();
-      const raw  = data.files?.[CONFIG.GIST_FILENAME]?.content;
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      return parsed.link || null;
+      return data.record?.link || null;
     } catch { return null; }
   }
 
+  // ── Opslaan ──
   async function writeLink(url) {
-    const content = JSON.stringify({ link: url });
-    const res = await fetch(GIST_API, {
-      method: 'PATCH',
+    const res = await fetch(API, {
+      method: 'PUT',
       headers: HEADERS,
-      body: JSON.stringify({
-        files: { [CONFIG.GIST_FILENAME]: { content } }
-      }),
+      body: JSON.stringify({ link: url }),
     });
-    if (!res.ok) throw new Error('GitHub API error');
+    if (!res.ok) throw new Error('JSONBin error');
   }
 
-  async function clearLink() {
-    const content = JSON.stringify({ link: '' });
-    const res = await fetch(GIST_API, {
-      method: 'PATCH',
-      headers: HEADERS,
-      body: JSON.stringify({
-        files: { [CONFIG.GIST_FILENAME]: { content } }
-      }),
-    });
-    if (!res.ok) throw new Error('GitHub API error');
-  }
-
-  // ── Render albumlink ──
+  // ── Render link ──
   function renderLink(url) {
     const el = document.getElementById('albumLink');
     if (url) {
@@ -537,10 +483,10 @@
 
   async function loadLink() {
     const url = await fetchLink();
-    renderLink(url || null);
+    renderLink(url);
   }
 
-  // ── Wachtwoord modal ──
+  // ── Wachtwoord ──
   function openPasswordModal() {
     document.getElementById('passwordInput').value = '';
     document.getElementById('passwordError').classList.remove('visible');
@@ -549,7 +495,7 @@
     setTimeout(() => document.getElementById('passwordInput').focus(), 120);
   }
 
-  async function checkPassword() {
+  function checkPassword() {
     if (document.getElementById('passwordInput').value === CONFIG.ADMIN_PASSWORD) {
       closeModal('passwordModal');
       openAdminModal();
@@ -561,7 +507,7 @@
     }
   }
 
-  // ── Admin modal ──
+  // ── Admin paneel ──
   async function openAdminModal() {
     document.getElementById('saveError').classList.remove('visible');
     const current = await fetchLink();
@@ -575,14 +521,12 @@
     const del = document.getElementById('deleteBtn');
     btn.disabled = loading;
     del.disabled = loading;
-    btn.innerHTML = loading
-      ? '<div class="spinner"></div> Opslaan…'
-      : 'Opslaan';
+    btn.innerHTML = loading ? '<div class="spinner"></div> Opslaan…' : 'Opslaan';
   }
 
   async function saveLink() {
     let val = document.getElementById('linkInput').value.trim();
-    if (!val) { await deleteLink(); return; }
+    if (!val) { deleteLink(); return; }
     if (!val.startsWith('http')) val = 'https://' + val;
     setLoading(true);
     document.getElementById('saveError').classList.remove('visible');
@@ -601,7 +545,7 @@
     if (!confirm('Weet je zeker dat je de albumlink wilt verwijderen?')) return;
     setLoading(true);
     try {
-      await clearLink();
+      await writeLink('');
       renderLink(null);
       closeModal('adminModal');
     } catch {
