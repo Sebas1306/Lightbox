@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Foto's toevoegen aan gedeeld album</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>
   // ════════════════════════════════════════════
   //  ✏️  INSTELLINGEN
@@ -20,16 +20,18 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #f0f4fa;
-    --ink: #0f1f3d;
-    --blue: #1a56db;
-    --blue-dark: #1344b8;
-    --blue-light: #e8effe;
-    --muted: #5c7099;
-    --card: #ffffff;
-    --border: #dce6f5;
-    --red: #d93025;
-    --red-light: #fce8e6;
+    --bg:          #f9f5ef;
+    --bg2:         #f2ece2;
+    --ink:         #1c1510;
+    --warm:        #cc6b2c;
+    --warm-dark:   #a8521a;
+    --warm-light:  #faeee0;
+    --warm-mid:    #e8d5be;
+    --muted:       #7a6654;
+    --card:        #ffffff;
+    --border:      #e4d9cc;
+    --red:         #c0392b;
+    --red-light:   #fdecea;
   }
 
   body {
@@ -45,48 +47,50 @@
 
   .container { max-width: 440px; width: 100%; }
 
+  /* ── Header ── */
   .header {
     text-align: center;
     margin-bottom: 2rem;
     animation: fadeUp 0.6s ease both;
   }
 
-  .icon { font-size: 2.4rem; display: block; margin-bottom: 0.85rem; }
+  .icon { font-size: 2.5rem; display: block; margin-bottom: 0.9rem; }
 
   h1 {
-    font-weight: 600;
-    font-size: 1.45rem;
-    line-height: 1.2;
-    margin-bottom: 0.35rem;
-    letter-spacing: -0.02em;
+    font-family: 'Lora', serif;
+    font-weight: 500;
+    font-size: 1.6rem;
+    line-height: 1.25;
+    margin-bottom: 0.4rem;
     color: var(--ink);
   }
 
-  h1 em { font-style: normal; color: var(--blue); }
-  .subtitle { color: var(--muted); font-size: 0.85rem; }
+  h1 em { font-style: italic; color: var(--warm); }
+  .subtitle { color: var(--muted); font-size: 0.85rem; font-weight: 400; }
 
   /* ── Album link card ── */
   .album-card {
-    background: var(--blue);
-    border-radius: 14px;
+    background: var(--warm);
+    border-radius: 16px;
     padding: 1.1rem 1.25rem;
     margin-bottom: 1.25rem;
     display: flex;
     align-items: center;
     gap: 0.85rem;
     animation: fadeUp 0.5s 0.05s ease both;
+    box-shadow: 0 4px 20px rgba(204,107,44,0.25);
   }
 
-  .album-card-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .album-card-icon { font-size: 1.5rem; flex-shrink: 0; }
   .album-card-text { flex: 1; min-width: 0; }
 
   .album-card-label {
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.65);
     font-size: 0.67rem;
     text-transform: uppercase;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.1em;
     margin-bottom: 0.15rem;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .album-link-btn {
@@ -132,14 +136,14 @@
     z-index: 50;
   }
 
-  .admin-trigger:hover { color: var(--blue); border-color: var(--blue); }
+  .admin-trigger:hover { color: var(--warm); border-color: var(--warm); }
 
   /* ── Modals ── */
   .modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(10,25,60,0.4);
+    background: rgba(28,21,16,0.45);
     z-index: 100;
     align-items: center;
     justify-content: center;
@@ -150,12 +154,12 @@
   .modal-overlay.open { display: flex; }
 
   .modal {
-    background: #fff;
-    border-radius: 18px;
+    background: var(--card);
+    border-radius: 20px;
     padding: 1.6rem 1.4rem;
     width: 100%;
     max-width: 380px;
-    box-shadow: 0 16px 48px rgba(20,60,140,0.15);
+    box-shadow: 0 16px 48px rgba(100,60,20,0.15);
     animation: modalPop 0.22s ease;
   }
 
@@ -164,22 +168,28 @@
     to   { opacity: 1; transform: scale(1) translateY(0); }
   }
 
-  .modal h2 { font-weight: 600; font-size: 1.05rem; margin-bottom: 0.3rem; color: var(--ink); }
+  .modal h2 {
+    font-family: 'Lora', serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+    color: var(--ink);
+  }
 
   .modal p {
     color: var(--muted);
     font-size: 0.79rem;
     margin-bottom: 0.9rem;
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
   .modal label {
     display: block;
-    font-size: 0.73rem;
+    font-size: 0.72rem;
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.08em;
     margin-bottom: 0.3rem;
   }
 
@@ -197,7 +207,7 @@
     margin-bottom: 0.75rem;
   }
 
-  .modal input:focus { border-color: var(--blue); background: #fff; }
+  .modal input:focus { border-color: var(--warm); background: #fff; }
   .modal input.error { border-color: var(--red); }
 
   .error-msg {
@@ -213,7 +223,7 @@
 
   .btn-primary {
     flex: 1;
-    background: var(--blue);
+    background: var(--warm);
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -229,12 +239,12 @@
     gap: 0.4rem;
   }
 
-  .btn-primary:hover:not(:disabled) { background: var(--blue-dark); }
+  .btn-primary:hover:not(:disabled) { background: var(--warm-dark); }
   .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 
   .btn-secondary {
-    background: var(--blue-light);
-    color: var(--blue);
+    background: var(--warm-light);
+    color: var(--warm-dark);
     border: none;
     border-radius: 10px;
     padding: 0.65rem 1rem;
@@ -245,7 +255,7 @@
     transition: background 0.2s;
   }
 
-  .btn-secondary:hover { background: #d5e3f8; }
+  .btn-secondary:hover { background: var(--warm-mid); }
 
   .btn-danger {
     background: var(--red-light);
@@ -277,8 +287,8 @@
 
   .step {
     background: var(--card);
-    border-radius: 12px;
-    padding: 0.95rem 1.1rem;
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
     display: flex;
     align-items: flex-start;
     gap: 0.9rem;
@@ -294,8 +304,8 @@
   .step:nth-child(6) { animation-delay: 0.45s; }
 
   .step-num {
-    background: var(--blue-light);
-    color: var(--blue);
+    background: var(--warm-light);
+    color: var(--warm);
     font-size: 0.78rem;
     font-weight: 700;
     width: 26px;
@@ -309,23 +319,37 @@
   }
 
   .step-content { flex: 1; }
-  .step-title { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.15rem; color: var(--ink); }
-  .step-desc { color: var(--muted); font-size: 0.79rem; line-height: 1.45; }
-  .step-desc strong { color: var(--ink); font-weight: 500; }
-  .step-icon { font-size: 1rem; flex-shrink: 0; margin-top: 3px; opacity: 0.7; }
 
+  .step-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.18rem;
+    color: var(--ink);
+  }
+
+  .step-desc {
+    color: var(--muted);
+    font-size: 0.79rem;
+    line-height: 1.5;
+  }
+
+  .step-desc strong { color: var(--ink); font-weight: 500; }
+  .step-icon { font-size: 1rem; flex-shrink: 0; margin-top: 3px; opacity: 0.65; }
+
+  /* ── Tip ── */
   .tip {
     margin-top: 1.1rem;
-    background: var(--blue-light);
-    border-left: 3px solid var(--blue);
-    border-radius: 0 10px 10px 0;
-    padding: 0.75rem 0.9rem;
-    font-size: 0.78rem;
+    background: var(--warm-light);
+    border-left: 3px solid var(--warm);
+    border-radius: 0 12px 12px 0;
+    padding: 0.8rem 1rem;
+    font-size: 0.79rem;
     color: var(--muted);
+    line-height: 1.5;
     animation: fadeUp 0.5s 0.52s ease both;
   }
 
-  .tip strong { color: var(--blue); font-weight: 500; }
+  .tip strong { color: var(--warm-dark); font-weight: 600; }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(12px); }
@@ -339,7 +363,7 @@
   <div class="header">
     <span class="icon">📸</span>
     <h1>Foto's in het <em>gedeelde album</em> zetten</h1>
-    <p class="subtitle">Volg deze stappen op je iPhone of iPad</p>
+    <p class="subtitle">Volg deze stappen in Google Foto's</p>
   </div>
 
   <div class="album-card">
@@ -354,55 +378,55 @@
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-content">
-        <div class="step-title">Open de Foto's-app</div>
-        <div class="step-desc">Ga naar je Camera Rol of een album met de foto's die je wilt delen.</div>
+        <div class="step-title">Open Google Foto's</div>
+        <div class="step-desc">Open de <strong>Google Foto's</strong>-app op je telefoon. Heb je hem nog niet? Download hem gratis in de App Store of Play Store.</div>
       </div>
-      <div class="step-icon">🖼️</div>
+      <div class="step-icon">📱</div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-content">
         <div class="step-title">Selecteer foto's</div>
-        <div class="step-desc">Tik op <strong>Selecteer</strong> (rechtsboven) en tik alle foto's aan.</div>
+        <div class="step-desc">Houd één foto <strong>ingedrukt</strong> om de selectiemodus te starten, tik daarna alle foto's aan die je wilt delen.</div>
       </div>
       <div class="step-icon">☑️</div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-content">
-        <div class="step-title">Deel via het deelknopje</div>
-        <div class="step-desc">Tik op het <strong>deelicoon</strong> linksonder (vierkantje met pijltje omhoog).</div>
+        <div class="step-title">Tik op het deelicoon</div>
+        <div class="step-desc">Tik rechtsboven op het <strong>deelicoon</strong> (pijltje omhoog of drie stippen verbonden).</div>
       </div>
       <div class="step-icon">⬆️</div>
     </div>
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-content">
-        <div class="step-title">Kies "Voeg toe aan gedeeld album"</div>
-        <div class="step-desc">Scroll in het deelmenu en tik op <strong>Voeg toe aan gedeeld album</strong>.</div>
+        <div class="step-title">Kies "Toevoegen aan album"</div>
+        <div class="step-desc">Tik op <strong>Toevoegen aan album</strong> in het deelmenu.</div>
       </div>
       <div class="step-icon">＋</div>
     </div>
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-content">
-        <div class="step-title">Selecteer het juiste album</div>
-        <div class="step-desc">Kies het album uit de lijst, of maak een <strong>Nieuw gedeeld album</strong> aan.</div>
+        <div class="step-title">Selecteer het gedeelde album</div>
+        <div class="step-desc">Kies het juiste album uit de lijst. Staat het er niet bij? Gebruik dan de link hierboven om het album te openen en jezelf toe te voegen.</div>
       </div>
       <div class="step-icon">📁</div>
     </div>
     <div class="step">
       <div class="step-num">6</div>
       <div class="step-content">
-        <div class="step-title">Tik op "Publiceer"</div>
-        <div class="step-desc">Bevestig met <strong>Publiceer</strong>. De foto's zijn nu zichtbaar voor iedereen!</div>
+        <div class="step-title">Klaar!</div>
+        <div class="step-desc">Je foto's zijn toegevoegd en meteen zichtbaar voor iedereen in het album. Bedankt! 🎉</div>
       </div>
       <div class="step-icon">✅</div>
     </div>
   </div>
 
   <div class="tip">
-    <strong>💡 Tip:</strong> Zorg dat <em>Gedeelde albums</em> aan staat via Instellingen → Foto's → Gedeelde albums.
+    <strong>💡 Tip:</strong> Heb je Google Foto's nog niet? Download de app gratis via de <em>App Store</em> (iPhone) of <em>Play Store</em> (Android).
   </div>
 </div>
 
@@ -429,7 +453,7 @@
     <h2>⚙️ Albumlink beheren</h2>
     <p>De link wordt opgeslagen en is meteen zichtbaar voor alle bezoekers.</p>
     <label for="linkInput">Albumlink</label>
-    <input type="url" id="linkInput" placeholder="https://share.icloud.com/photos/..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <input type="url" id="linkInput" placeholder="https://photos.google.com/share/..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     <div class="error-msg" id="saveError">Opslaan mislukt. Probeer opnieuw.</div>
     <div class="modal-actions">
       <button class="btn-danger" id="deleteBtn" onclick="deleteLink()">Verwijder</button>
@@ -447,7 +471,6 @@
     'X-Bin-Versioning': 'false',
   };
 
-  // ── Ophalen ──
   async function fetchLink() {
     try {
       const res  = await fetch(API + '/latest', { headers: HEADERS });
@@ -456,7 +479,6 @@
     } catch { return null; }
   }
 
-  // ── Opslaan ──
   async function writeLink(url) {
     const res = await fetch(API, {
       method: 'PUT',
@@ -466,7 +488,6 @@
     if (!res.ok) throw new Error('JSONBin error');
   }
 
-  // ── Render link ──
   function renderLink(url) {
     const el = document.getElementById('albumLink');
     if (url) {
@@ -483,10 +504,9 @@
 
   async function loadLink() {
     const url = await fetchLink();
-    renderLink(url);
+    renderLink(url || null);
   }
 
-  // ── Wachtwoord ──
   function openPasswordModal() {
     document.getElementById('passwordInput').value = '';
     document.getElementById('passwordError').classList.remove('visible');
@@ -507,7 +527,6 @@
     }
   }
 
-  // ── Admin paneel ──
   async function openAdminModal() {
     document.getElementById('saveError').classList.remove('visible');
     const current = await fetchLink();
@@ -555,7 +574,6 @@
     }
   }
 
-  // ── Modal helpers ──
   function openModal(id)  { document.getElementById(id).classList.add('open'); }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
   function handleOverlay(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
